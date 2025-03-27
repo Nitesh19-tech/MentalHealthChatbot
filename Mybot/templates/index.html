@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        #chatbox {
+            width: 80%;
+            max-width: 600px;
+            height: 300px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            overflow-y: auto;
+            margin: 20px auto;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+        }
+        #userInput {
+            width: 70%;
+            padding: 10px;
+            margin: 10px;
+        }
+        #sendButton {
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #sendButton:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chatbot</h1>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Type your message here...">
+    <button id="sendButton">Send</button>
+
+    <script>
+        document.getElementById('sendButton').addEventListener('click', () => {
+    const userInput = document.getElementById('userInput').value;
+    if (!userInput) return;
+
+    // Add user message to the chatbox
+    const chatbox = document.getElementById('chatbox');
+    const userMessage = document.createElement('p');
+    userMessage.textContent = `You: ${userInput}`;
+    chatbox.appendChild(userMessage);
+
+    // Send user input to the backend
+    fetch(`http://127.0.0.1:8000/chatbot/get_response/?query=${encodeURIComponent(userInput)}`)
+        .then(response => response.json())
+        .then(data => {
+            // Display chatbot response
+            const botMessage = document.createElement('p');
+            botMessage.textContent = `Bot: ${data.reply}`;
+            chatbox.appendChild(botMessage);
+            chatbox.scrollTop = chatbox.scrollHeight; // Scroll to the bottom
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            const errorMessage = document.createElement('p');
+            errorMessage.textContent = 'Bot: Sorry, something went wrong. Please try again later.';
+            chatbox.appendChild(errorMessage);
+        });
+
+    // Clear input field
+    document.getElementById('userInput').value = '';
+});
+
+    </script>
+</body>
+</html>
