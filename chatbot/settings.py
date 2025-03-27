@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-v9fb4ds7e-p@b6(c)6mx1=$o!iwus+!68&_^k97+!*uibrpw@c
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["mentalhealthchatbot-u414.onrender.com", "127.0.0.1", "localhost"]
+
 
 
 # Application definition
