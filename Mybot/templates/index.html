@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- ✅ jQuery Include -->
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -47,37 +49,40 @@
     <button id="sendButton">Send</button>
 
     <script>
-        document.getElementById('sendButton').addEventListener('click', () => {
-    const userInput = document.getElementById('userInput').value;
-    if (!userInput) return;
+        $(document).ready(function() {
+            $("#sendButton").click(function() {
+                var userInput = $("#userInput").val().trim();
+                if (userInput === "") return;
 
-    // Add user message to the chatbox
-    const chatbox = document.getElementById('chatbox');
-    const userMessage = document.createElement('p');
-    userMessage.textContent = `You: ${userInput}`;
-    chatbox.appendChild(userMessage);
+                var chatbox = $("#chatbox");
+                chatbox.append("<p><strong>You:</strong> " + userInput + "</p>");
 
-    // Send user input to the backend
-    fetch(`http://127.0.0.1:8000/chatbot/get_response/?query=${encodeURIComponent(userInput)}`)
-        .then(response => response.json())
-        .then(data => {
-            // Display chatbot response
-            const botMessage = document.createElement('p');
-            botMessage.textContent = `Bot: ${data.reply}`;
-            chatbox.appendChild(botMessage);
-            chatbox.scrollTop = chatbox.scrollHeight; // Scroll to the bottom
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            const errorMessage = document.createElement('p');
-            errorMessage.textContent = 'Bot: Sorry, something went wrong. Please try again later.';
-            chatbox.appendChild(errorMessage);
+                // ✅ AJAX Request to Django
+                $.ajax({
+                    url: "/get_response/",
+                    type: "GET",
+                    data: { query: userInput },
+                    dataType: "json",
+                    success: function(response) {
+                        chatbox.append("<p><strong>Bot:</strong> " + response.reply + "</p>");
+                        chatbox.scrollTop(chatbox[0].scrollHeight); // ✅ Auto-scroll down
+                    },
+                    error: function(xhr, status, error) {
+                        chatbox.append("<p><strong>Bot:</strong> ❌ Error fetching response!</p>");
+                        console.error("Error:", error);
+                    }
+                });
+
+                $("#userInput").val(""); // ✅ Clear input field
+            });
+
+            // ✅ Enter key support
+            $("#userInput").keypress(function(event) {
+                if (event.which === 13) { // 13 = Enter key
+                    $("#sendButton").click();
+                }
+            });
         });
-
-    // Clear input field
-    document.getElementById('userInput').value = '';
-});
-
     </script>
 </body>
 </html>
